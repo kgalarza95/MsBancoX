@@ -15,10 +15,16 @@ import org.springframework.stereotype.Service;
  * @author kgalarza
  */
 @Service
-public class ReporteServiceImpl implements ReporteService{
+public class ReporteServiceImpl implements ReporteService {
 
     @Autowired
     private MovimientoRepository movimientoRepository;
+
+    public List<ReporteEstadoCuentaDto> generarReporteEstadoCuenta(LocalDate fechaInicio, LocalDate fechaFin, Long idCliente) {
+        LocalDateTime fechaInicioDateTime = fechaInicio.atStartOfDay();
+        LocalDateTime fechaFinDateTime = fechaFin.atTime(LocalTime.MAX);
+        return movimientoRepository.obtenerReporteEstadoCuenta(fechaInicioDateTime, fechaFinDateTime, idCliente);
+    }
 
     public List<ReporteEstadoCuentaDto> generarReporteEstadoCuenta(LocalDate fechaInicio, LocalDate fechaFin) {
         LocalDateTime fechaInicioDateTime = fechaInicio.atStartOfDay();

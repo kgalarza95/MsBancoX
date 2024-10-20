@@ -25,9 +25,17 @@ public class ReporteController {
     @GetMapping
     public List<ReporteEstadoCuentaDto> obtenerReporteEstadoCuenta(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
-        return reporteService.generarReporteEstadoCuenta(fechaInicio, fechaFin);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+            @RequestParam Long idCliente) {
+        return reporteService.generarReporteEstadoCuenta(fechaInicio, fechaFin, idCliente);
     }
+
+//    @GetMapping
+//    public List<ReporteEstadoCuentaDto> obtenerReporteEstadoCuenta(
+//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+//        return reporteService.generarReporteEstadoCuenta(fechaInicio, fechaFin);
+//    }
 
     @GetMapping("/todos")
     public List<ReporteEstadoCuentaDto> obtenerTodosLosReportes() {

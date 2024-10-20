@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ReporteService {
 
+    public List<ReporteEstadoCuentaDto> generarReporteEstadoCuenta(LocalDate fechaInicio, LocalDate fechaFin, Long idCliente);
+    
     public List<ReporteEstadoCuentaDto> generarReporteEstadoCuenta(LocalDate fechaInicio, LocalDate fechaFin);
     
     public List<ReporteEstadoCuentaDto> generarReporteEstadoCuenta();

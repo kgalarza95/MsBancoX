@@ -34,4 +34,18 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
             + "JOIN Movimiento mv ON mv.cuenta.id = cta.id "
             + "ORDER BY mv.fechaMovimiento, cta.numeroCuenta")
     List<ReporteEstadoCuentaDto> obtenerReporteEstadoCuenta();
+
+    @Query("SELECT new com.kgalarza.cuentamovimiento.msbancox.model.dto.ReporteEstadoCuentaDto(mv.fechaMovimiento, cl.nombre, cta.numeroCuenta, cta.tipoCuenta, mv.saldoInicial, mv.valorMovimiento, mv.saldoDisponible, mv.descripcionMovimiento, cta.estado) "
+            + "FROM Cliente cl "
+            + "JOIN Cuenta cta ON cl.clienteid = cta.clienteid "
+            + "JOIN Movimiento mv ON mv.cuenta.id = cta.id "
+            + "WHERE 1 = 1"
+            + "AND mv.fechaMovimiento BETWEEN :fechaInicio AND :fechaFin "
+            + "AND cta.estado = true "
+            + "AND cl.clienteid = :idUsuario "
+            + "ORDER BY mv.fechaMovimiento, cta.numeroCuenta")
+    List<ReporteEstadoCuentaDto> obtenerReporteEstadoCuenta(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin,
+            @Param("idUsuario") Long idUsuario);
 }
