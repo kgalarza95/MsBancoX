@@ -30,15 +30,14 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     public List<ClienteInOutDto> getAllClientes() {
-//        List<Cliente> clientes = clienteRepository.findAll();
-//        if (clientes.isEmpty()) {
-//            throw new ResourceNotFoundException("No hay registros para mostrar");
-//        }
+
 //        return clientes.stream()
 //                .map(cliente -> modelMapper.map(cliente, ClienteInOutDto.class))
 //                .collect(Collectors.toList());
-
         List<Cliente> clientes = clienteRepository.findAll();
+        if (clientes.isEmpty()) {
+            throw new ResourceNotFoundException("No hay registros para mostrar");
+        }
         return clienteMapper.toDtoList(clientes);
     }
 
