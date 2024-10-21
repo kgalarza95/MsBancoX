@@ -1,0 +1,24 @@
+services:
+  clientes-service:
+    build:
+      context: ./MsGestionClientesX # Asegúrate de que esta ruta es correcta
+      dockerfile: Dockerfile
+    container_name: clientes-service
+    ports:
+      - "8081:8081" 
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/banco_x?useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=gestion_bancaria
+      - SPRING_DATASOURCE_PASSWORD=gestion_bancaria
+
+  cuentas-movimientos-service:
+    build:
+      context: ./MsGestionCuentasMovimientos 
+      dockerfile: Dockerfile
+    container_name: cuentas-movimientos-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/banco_x?useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=gestion_bancaria
+      - SPRING_DATASOURCE_PASSWORD=gestion_bancaria

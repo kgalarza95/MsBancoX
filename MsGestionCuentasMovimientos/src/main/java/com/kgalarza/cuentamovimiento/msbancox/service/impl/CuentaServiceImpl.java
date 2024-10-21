@@ -1,17 +1,21 @@
 package com.kgalarza.cuentamovimiento.msbancox.service.impl;
 
+import com.kgalarza.cuentamovimiento.msbancox.exception.ClienteNotFoundException;
 import com.kgalarza.cuentamovimiento.msbancox.exception.RegistroDuplicadoException;
 import com.kgalarza.cuentamovimiento.msbancox.exception.ResourceNotFoundException;
 import com.kgalarza.cuentamovimiento.msbancox.mapper.CuentaMapper;
+import com.kgalarza.cuentamovimiento.msbancox.model.dto.ClienteInOutDto;
 import com.kgalarza.cuentamovimiento.msbancox.model.dto.CuentaInDto;
 import com.kgalarza.cuentamovimiento.msbancox.model.dto.CuentaNoValidInDto;
 import com.kgalarza.cuentamovimiento.msbancox.model.dto.CuentaOutDto;
 import com.kgalarza.cuentamovimiento.msbancox.model.entity.Cuenta;
 import com.kgalarza.cuentamovimiento.msbancox.repository.CuentaRepository;
+import com.kgalarza.cuentamovimiento.msbancox.service.ClienteService;
 import com.kgalarza.cuentamovimiento.msbancox.service.CuentaService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  *
@@ -22,11 +26,13 @@ public class CuentaServiceImpl implements CuentaService {
 
     private final CuentaRepository cuentaRepository;
     private final CuentaMapper cuentaMapper;
+    private final ClienteService clienteService;
 
     @Autowired
-    public CuentaServiceImpl(CuentaRepository cuentaRepository, CuentaMapper cuentaMapper) {
+    public CuentaServiceImpl(CuentaRepository cuentaRepository, CuentaMapper cuentaMapper, ClienteService clienteService) {
         this.cuentaRepository = cuentaRepository;
         this.cuentaMapper = cuentaMapper;
+        this.clienteService = clienteService;
     }
 
     public List<CuentaOutDto> findAllCuentas() {
@@ -36,9 +42,6 @@ public class CuentaServiceImpl implements CuentaService {
             throw new ResourceNotFoundException("No hay registros para mostrar");
         }
         return cuentaMapper.toDtoList(cuentas);
-//        return listCuentaDto.stream()
-//                .map(cuenta -> modelMapper.map(cuenta, CuentaOutDto.class))
-//                .collect(Collectors.toList());
     }
 
     public CuentaOutDto findById(Long id) {
@@ -47,17 +50,36 @@ public class CuentaServiceImpl implements CuentaService {
         return cuentaMapper.toDto(cuenta);
     }
 
-    public CuentaOutDto createCuenta(CuentaInDto cuentaDto) {
-        //llamada asincrona a clientes
+//    public CuentaOutDto createCuenta(CuentaInDto cuentaDto) {
+//        //llamada asincrona a clientes
 //        clienteService.getClienteById(cuentaDto.getClienteid());
+//
+//        if (cuentaRepository.existsByNumeroCuenta(cuentaDto.getNumeroCuenta())) {
+//            throw new RegistroDuplicadoException("La cuenta ya se encuentra registrada.");
+//        }
+//        Cuenta cuenta = cuentaMapper.toEntity(cuentaDto);
+//        cuenta = cuentaRepository.save(cuenta);
+//        return cuentaMapper.toDto(cuenta);
+//    }
+    public Mono<CuentaOutDto> createCuenta(CuentaInDto cuentaDto) {
+        return clienteService.getClienteById(cuentaDto.getClienteid())
+                .flatMap(cliente -> {
+                    if (cliente == null) {
+                        return Mono.error(new ClienteNotFoundException(cuentaDto.getClienteid()));
+                    }
 
-//        this.webClient = webClientBuilder.baseUrl("https://api.example.com").build();
-        if (cuentaRepository.existsByNumeroCuenta(cuentaDto.getNumeroCuenta())) {
-            throw new RegistroDuplicadoException("La cuenta ya se encuentra registrada.");
-        }
-        Cuenta cuenta = cuentaMapper.toEntity(cuentaDto);
-        cuenta = cuentaRepository.save(cuenta);
-        return cuentaMapper.toDto(cuenta);
+                    // Usamos fromCallable para hacer la llamada sincrónica dentro de un flujo reactivo
+                    return Mono.fromCallable(() -> cuentaRepository.existsByNumeroCuenta(cuentaDto.getNumeroCuenta()))
+                            .flatMap(exists -> {
+                                if (exists) {
+                                    return Mono.error(new RegistroDuplicadoException("La cuenta ya se encuentra registrada."));
+                                }
+
+                                Cuenta cuenta = cuentaMapper.toEntity(cuentaDto);
+                                return Mono.just(cuentaRepository.save(cuenta))
+                                        .map(cuentaGuardada -> cuentaMapper.toDto(cuentaGuardada));
+                            });
+                });
     }
 
     public CuentaOutDto updateCuenta(CuentaInDto cuentaDto) {

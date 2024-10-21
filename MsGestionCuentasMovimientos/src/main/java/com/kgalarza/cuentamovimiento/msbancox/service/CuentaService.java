@@ -5,6 +5,7 @@ import com.kgalarza.cuentamovimiento.msbancox.model.dto.CuentaNoValidInDto;
 import com.kgalarza.cuentamovimiento.msbancox.model.dto.CuentaOutDto;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  *
@@ -17,7 +18,7 @@ public interface CuentaService {
 
     public CuentaOutDto findById(Long id);
 
-    public CuentaOutDto createCuenta(CuentaInDto cuentaDto);
+    public Mono<CuentaOutDto> createCuenta(CuentaInDto cuentaDto);
 
     public CuentaOutDto updateCuenta(CuentaInDto cuentaDto);
 

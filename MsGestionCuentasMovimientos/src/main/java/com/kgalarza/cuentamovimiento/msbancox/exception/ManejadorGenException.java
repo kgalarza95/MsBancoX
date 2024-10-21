@@ -51,6 +51,14 @@ public class ManejadorGenException {
         HttpStatus estado = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(new RespuestaOutDto(estado, ex.getMessage(), ex.getMessage()), estado);
     }
+    
+
+    @ExceptionHandler(ClienteNotFoundException.class)
+    public ResponseEntity<RespuestaOutDto> ClienteNotFoundException(RegistroDuplicadoException ex) {
+        logger.warn("Cliente no encontrado", ex.getMessage());
+        HttpStatus estado = HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(new RespuestaOutDto(estado, ex.getMessage(), ex.getMessage()), estado);
+    }
 
     @ExceptionHandler(ValidacionGeneralCtasException.class)
     public ResponseEntity<RespuestaOutDto> ValidacionGeneralCtasException(ValidacionGeneralCtasException ex) {

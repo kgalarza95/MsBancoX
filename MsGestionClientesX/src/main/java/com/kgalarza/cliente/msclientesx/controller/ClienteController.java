@@ -29,7 +29,6 @@ public class ClienteController {
 
     @GetMapping("/{clienteid}")
     public ResponseEntity<?> getCliente(@PathVariable Long clienteid) {
-
         return new ResponseEntity<>(clienteService.getClienteById(clienteid), HttpStatus.OK);
     }
 
